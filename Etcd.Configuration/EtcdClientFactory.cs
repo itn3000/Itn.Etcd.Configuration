@@ -16,7 +16,7 @@ namespace Etcd.Configuration
     /// <param name="serverName">server name</param>
     /// <param name="configureChannelOptions">configuring gRPC channel options</param>
     /// <param name="configureSslOptions">configuring TLS options</param>
-    public class EtcdClientFactory(string url, string user = "", string password = "", string serverName = "etcd-server", Action<GrpcChannelOptions>? configureChannelOptions = null, Action<SslClientAuthenticationOptions>? configureSslOptions = null)
+    class EtcdClientFactory(string url, string user = "", string password = "", string serverName = "etcd-server", Action<GrpcChannelOptions>? configureChannelOptions = null, Action<SslClientAuthenticationOptions>? configureSslOptions = null)
     {
         public Action<GrpcChannelOptions>? ConfigureChannelOptions
         {

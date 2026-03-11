@@ -5,11 +5,11 @@ using System.Text;
 
 namespace Etcd.Configuration
 {
-    class EtcdConfigurationSource(string key, EtcdClientFactory etcdClientFactory) : IConfigurationSource
+    class EtcdConfigurationSource(EtcdConfigurationOptions options, EtcdClientFactory etcdClientFactory) : IConfigurationSource
     {
         public IConfigurationProvider Build(IConfigurationBuilder builder)
         {
-            return new EtcdConfigurationProvider(key, etcdClientFactory);
+            return new EtcdConfigurationProvider(options.RootKey, etcdClientFactory, TimeSpan.FromSeconds(options.CheckStatusIntervalSec), TimeSpan.FromSeconds(options.LoadThrottleSec));
         }
     }
 }

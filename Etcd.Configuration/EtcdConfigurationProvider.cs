@@ -28,16 +28,20 @@ namespace Etcd.Configuration
         long? _watchId = null;
         DateTimeOffset lastLoad;
         ConcurrentDictionary<long, CancellationTokenSource> ChangeTokens = new();
+        TimeSpan checkStatusInterval;
+        TimeSpan loadThrottle;
         static long ChangeTokenKeySeed = 0;
-        public EtcdConfigurationProvider(string key, EtcdClientFactory clientFactory)
+        public EtcdConfigurationProvider(string key, EtcdClientFactory clientFactory, TimeSpan checkStatusInterval, TimeSpan loadThrottle)
         {
+            this.checkStatusInterval = checkStatusInterval;
+            this.loadThrottle = loadThrottle;
             rootKey = key;
             etcdClient = null;
             etcdClientFactory = clientFactory;
             disposables = new DisposableBag();
             subject = new Subject<Unit>();
             lastLoad = DateTimeOffset.MinValue;
-            subject.ThrottleLast(TimeSpan.FromSeconds(1))
+            subject.ThrottleLast(loadThrottle)
                 .SubscribeAwait(async (unit, ct) =>
                 {
                     await LoadAsync(ct);
@@ -367,7 +371,7 @@ namespace Etcd.Configuration
                 }
                 try
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(10), terminate.Token);
+                    await Task.Delay(checkStatusInterval, terminate.Token);
                 }
                 catch { }
             }
