@@ -3,7 +3,8 @@ var builder = DistributedApplication.CreateBuilder(args);
 var etcd = builder.AddEtcd("etcdtest")
     ;
 builder.AddProject<Projects.Etcd_Configuration_TestWeb>("etcd-configuration-testweb")
-    .WithReference(etcd);
+    .WithReference(etcd)
+    .WaitFor(etcd);
 
 builder.Build().Run();
 
@@ -35,12 +36,16 @@ static class EtcdResourceExtension
             .WithImage("coreos/etcd")
             .WithImageRegistry("quay.io")
             .WithImageTag("v3.6.8")
-            .WithHttpEndpoint(name: "http", port: 2379, targetPort: 2379)
+            .WithHttpEndpoint(name: "http", targetPort: 2379)
+            .WithEnvironment("http_proxy", "")
+            .WithEnvironment("https_proxy", "")
             .WithUrlForEndpoint("http", annot =>
             {
                 annot.DisplayText = "http";
             })
-            .WithArgs("etcd", "-name", name, "-advertise-client-urls", "http://localhost:2380", "-listen-client-urls", "http://0.0.0.0:2379");
+            .WithArgs("etcd", "-name", name, "-advertise-client-urls", "http://localhost:2380", "-listen-client-urls", "http://0.0.0.0:2379")
             ;
     }
+
 }
+

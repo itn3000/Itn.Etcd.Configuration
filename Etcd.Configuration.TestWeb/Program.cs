@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using OpenTelemetry;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.AddEtcd(urls: builder.Configuration.GetConnectionString("etcdtest"));
+var connectionString = builder.Configuration.GetConnectionString("etcdtest");
+ArgumentNullException.ThrowIfNullOrEmpty(connectionString);
+builder.Configuration.AddEtcd(urls: connectionString);
 builder.Services.AddOpenTelemetry()
     .UseOtlpExporter()
     .WithTracing(tracer =>
