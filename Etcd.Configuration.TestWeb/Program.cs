@@ -4,7 +4,8 @@ using OpenTelemetry;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("etcdtest");
 ArgumentNullException.ThrowIfNullOrEmpty(connectionString);
-builder.Configuration.AddEtcd(urls: connectionString);
+var intervalSec = builder.Configuration.GetValue<int?>("Etcd:CheckStatusIntervalSec");
+builder.Configuration.AddEtcd(urls: connectionString, checkStatusIntervalSec: intervalSec.GetValueOrDefault(5));
 builder.Services.AddOpenTelemetry()
     .UseOtlpExporter()
     .WithTracing(tracer =>
