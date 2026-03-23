@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using EtcdEventNames = Itn.Etcd.Configuration.Definitions.EventNames;
 using ActivityNames = Itn.Etcd.Configuration.Definitions.ActivityNames;
+using System.Globalization;
 
 namespace Itn.Etcd.Configuration
 {
@@ -19,6 +20,7 @@ namespace Itn.Etcd.Configuration
         string rootKey;
         EtcdClient? etcdClient;
         static readonly ActivitySource activitySource = new ActivitySource(Definitions.ProviderDiagnosticName);
+        static readonly DiagnosticSource diagnosticSource = new DiagnosticListener(Definitions.ProviderDiagnosticName);
         Task WatchTask;
         Subject<Unit> subject;
         DisposableBag disposables;
@@ -80,10 +82,13 @@ namespace Itn.Etcd.Configuration
             }
             catch (Exception e)
             {
+                if (diagnosticSource.IsEnabled(EtcdEventNames.WaitTaskError))
+                {
+                    diagnosticSource.Write(EtcdEventNames.WaitTaskError, new ExceptionEventArgs(e, act?.Id ?? ""));
+                }
                 if (act != null)
                 {
-                    act.AddException(e, [new("name", EtcdEventNames.WaitTaskError)]);
-                    act.SetStatus(ActivityStatusCode.Error);
+                    act.SetStatus(ActivityStatusCode.Error, EtcdEventNames.WaitTaskError);
                 }
             }
             try
@@ -94,10 +99,13 @@ namespace Itn.Etcd.Configuration
             }
             catch (Exception e)
             {
+                if (diagnosticSource.IsEnabled(EtcdEventNames.DisposeClientError))
+                {
+                    diagnosticSource.Write(EtcdEventNames.DisposeClientError, new ExceptionEventArgs(e, act?.Id ?? ""));
+                }
                 if (act != null)
                 {
-                    act.AddException(e, [new("name", EtcdEventNames.DisposeClientError)]);
-                    act.SetStatus(ActivityStatusCode.Error);
+                    act.SetStatus(ActivityStatusCode.Error, EtcdEventNames.DisposeClientError);
                 }
             }
         }
@@ -119,9 +127,9 @@ namespace Itn.Etcd.Configuration
                         if (lastLoad != prevUpdate)
                         {
                             // update by another thread already
-                            if (act != null)
+                            if (diagnosticSource.IsEnabled(EtcdEventNames.UpdateByAnother))
                             {
-                                act.AddEvent(new ActivityEvent(EtcdEventNames.UpdateByAnother));
+                                diagnosticSource.Write(EtcdEventNames.UpdateByAnother, new UpdateByAnotherEventArgs(act?.Id ?? ""));
                             }
                             break;
                         }
@@ -143,10 +151,13 @@ namespace Itn.Etcd.Configuration
                     }
                     catch (Exception e)
                     {
+                        if (diagnosticSource.IsEnabled(EtcdEventNames.LoadAsyncError))
+                        {
+                            diagnosticSource.Write(EtcdEventNames.LoadAsyncError, new ExceptionEventArgs(e, act?.Id ?? ""));
+                        }
                         if (act != null)
                         {
-                            act.AddException(e);
-                            act.SetStatus(ActivityStatusCode.Error, "LoadAsyncError");
+                            act.SetStatus(ActivityStatusCode.Error, EtcdEventNames.LoadAsyncError);
                         }
                     }
                     finally
@@ -181,9 +192,9 @@ namespace Itn.Etcd.Configuration
                     if (prevUpdate != lastLoad)
                     {
                         // update by another thread
-                        if (act != null)
+                        if (diagnosticSource.IsEnabled(EtcdEventNames.UpdateByAnother))
                         {
-                            act.AddEvent(new ActivityEvent(EtcdEventNames.UpdateByAnother));
+                            diagnosticSource.Write(EtcdEventNames.UpdateByAnother, new UpdateByAnotherEventArgs(act?.Id ?? ""));
                         }
                         return;
                     }
@@ -200,6 +211,10 @@ namespace Itn.Etcd.Configuration
                 }
                 catch (Exception e)
                 {
+                    if (diagnosticSource.IsEnabled(EtcdEventNames.LoadError))
+                    {
+                        diagnosticSource.Write(EtcdEventNames.LoadError, new ExceptionEventArgs(e, act?.Id ?? ""));
+                    }
                     if (act != null)
                     {
                         act.AddException(e, [new("name", EtcdEventNames.LoadError)]);
@@ -213,9 +228,9 @@ namespace Itn.Etcd.Configuration
             }
             catch (OperationCanceledException)
             {
-                if (act != null)
+                if (diagnosticSource.IsEnabled(EtcdEventNames.Cancel))
                 {
-                    act.AddEvent(new ActivityEvent(EtcdEventNames.Cancel));
+                    diagnosticSource.Write(EtcdEventNames.Cancel, new CancelEventArgs(act?.Id ?? ""));
                 }
             }
         }
@@ -244,9 +259,9 @@ namespace Itn.Etcd.Configuration
                 if (etcdClient != oldClient)
                 {
                     // already updated by another thread
-                    if (act != null)
+                    if (diagnosticSource.IsEnabled(EtcdEventNames.ClientAlreadyUpdate))
                     {
-                        act.AddEvent(new ActivityEvent(EtcdEventNames.ClientAlreadyUpdate));
+                        diagnosticSource.Write(EtcdEventNames.ClientAlreadyUpdate, new ClientAlreadyUpdateEventArgs(act?.Id ?? ""));
                     }
                     return;
                 }
@@ -258,9 +273,12 @@ namespace Itn.Etcd.Configuration
                 }
                 catch (Exception e)
                 {
+                    if (diagnosticSource.IsEnabled(EtcdEventNames.RenewClientError))
+                    {
+                        diagnosticSource.Write(EtcdEventNames.RenewClientError, new ExceptionEventArgs(e, act?.Id ?? ""));
+                    }
                     if (act != null)
                     {
-                        act.AddException(e, tags: [new("name", EtcdEventNames.RenewClientError)]);
                         act.SetStatus(ActivityStatusCode.Error);
                     }
                 }
@@ -317,28 +335,31 @@ namespace Itn.Etcd.Configuration
                                 WatchRangeCallback(res);
                             }, cancellationToken: terminate.Token);
                         }
-                        if(act != null)
+                        if (act != null)
                         {
                             act.AddTag("watch_id", _watchId.Value);
                         }
                         var statusRequest = new StatusRequest();
                         var res = await etcdClient.StatusAsync(statusRequest, cancellationToken: terminate.Token);
-                        if(act != null)
+                        if (diagnosticSource.IsEnabled(EtcdEventNames.Status))
                         {
-                            act.AddEvent(new ActivityEvent(EtcdEventNames.Status, tags: [
-                                new("version", res.Version),
-                                new("db_size", res.DbSize),
-                                new("watch_id", _watchId),
-                                new("root_key", rootKey),
-                                new("current_tokens_count", ChangeTokens.Count)
-                                ]));
+                            diagnosticSource.Write(EtcdEventNames.Status,
+                                new WatchStatusEventArgs(res.Version,
+                                    res.DbSize,
+                                    _watchId,
+                                    rootKey,
+                                    ChangeTokens.Count,
+                                    act?.Id ?? ""));
                         }
                     }
                     catch (RpcException rpcException)
                     {
-                        if(act != null)
+                        if (diagnosticSource.IsEnabled(EtcdEventNames.WatchError))
                         {
-                            act.AddException(rpcException, [new("name", EtcdEventNames.WatchError)]);
+                            diagnosticSource.Write(EtcdEventNames.WatchError, new ExceptionEventArgs(rpcException, act?.Id ?? ""));
+                        }
+                        if (act != null)
+                        {
                             act.SetStatus(ActivityStatusCode.Error);
                         }
                         try
@@ -350,16 +371,19 @@ namespace Itn.Etcd.Configuration
                     }
                     catch (OperationCanceledException)
                     {
-                        if(act != null)
+                        if (act != null)
                         {
                             act.AddEvent(new ActivityEvent(EtcdEventNames.OperationCancel));
                         }
                     }
                     catch (Exception e)
                     {
-                        if(act != null)
+                        if (diagnosticSource.IsEnabled(EtcdEventNames.WatchError))
                         {
-                            act.AddException(e, [new("name", EtcdEventNames.WatchError)]);
+                            diagnosticSource.Write(EtcdEventNames.WatchError, new ExceptionEventArgs(e, act?.Id ?? ""));
+                        }
+                        if (act != null)
+                        {
                             act.SetStatus(ActivityStatusCode.Error);
                         }
                         try
@@ -384,9 +408,12 @@ namespace Itn.Etcd.Configuration
                 }
                 catch (Exception e)
                 {
+                    if (diagnosticSource.IsEnabled(EtcdEventNames.WatchError))
+                    {
+                        diagnosticSource.Write(EtcdEventNames.WatchError, new ExceptionEventArgs(e, act?.Id ?? ""));
+                    }
                     if (act != null)
                     {
-                        act.AddException(e, [new("name", EtcdEventNames.WatchError)]);
                         act.SetStatus(ActivityStatusCode.Error);
                     }
                 }

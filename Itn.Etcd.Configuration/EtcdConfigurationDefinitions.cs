@@ -4,12 +4,23 @@ using System.Text;
 
 namespace Itn.Etcd.Configuration
 {
+    public record class ExceptionEventArgs(Exception Exception, string ActivityId);
+    public record class WatchStatusEventArgs(string Version,
+        long DbSize,
+        long? WatchId,
+        string RootKey,
+        int CurrentTokensCount,
+        string ActivityId);
+    public record class ClientAlreadyUpdateEventArgs(string ActivityId);
+    public record class UpdateByAnotherEventArgs(string ActivityId);
+    public record class CancelEventArgs(string ActivityId);
     public static class Definitions
     {
         public const string ProviderDiagnosticName = $"Etcd.Configuration.{nameof(EtcdConfigurationProvider)}";
         public static class EventNames
         {
             public const string LoadError = nameof(LoadError);
+            public const string LoadAsyncError = nameof(LoadAsyncError);
             public const string WatchError = nameof(WatchError);
             public const string OperationCancel = nameof(OperationCancel);
             public const string WaitTaskError = nameof(WaitTaskError);
