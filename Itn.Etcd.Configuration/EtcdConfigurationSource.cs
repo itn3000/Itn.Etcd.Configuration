@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Etcd.Configuration
+namespace Itn.Etcd.Configuration
 {
     class EtcdConfigurationSource(EtcdConfigurationOptions options, EtcdClientFactory etcdClientFactory) : IConfigurationSource
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Etcd.Configuration
+namespace Itn.Etcd.Configuration
 {
     public static class Definitions
     {

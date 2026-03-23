@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Itn.Etcd.Configuration.AspireAppHost/Itn.Etcd.Configuration.AspireAppHost.csproj" Id="6c7434b9-7323-46ad-a603-88f941c74029" />
+  <Project Path="Itn.Etcd.Configuration.AspireTest/Itn.Etcd.Configuration.AspireTest.csproj" Id="85ee27c9-05f9-45af-92b3-20fb992fc7b2" />
+  <Project Path="Itn.Etcd.Configuration.TestWeb/Itn.Etcd.Configuration.TestWeb.csproj" />
+  <Project Path="Itn.Etcd.Configuration/Itn.Etcd.Configuration.csproj" />
+</Solution>

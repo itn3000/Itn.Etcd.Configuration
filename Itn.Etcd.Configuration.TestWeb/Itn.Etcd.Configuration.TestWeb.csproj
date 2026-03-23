@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Etcd.Configuration\Etcd.Configuration.csproj" />
+    <ProjectReference Include="..\Itn.Etcd.Configuration\Etcd.Configuration.csproj" />
   </ItemGroup>
 
 </Project>

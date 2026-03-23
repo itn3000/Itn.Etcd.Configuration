@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Net.Security;
 using System.Text;
 
-namespace Etcd.Configuration
+namespace Itn.Etcd.Configuration
 {
     /// <summary>
     /// Factory for EtcdClient

@@ -9,10 +9,10 @@ using System.Diagnostics;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
-using EtcdEventNames = Etcd.Configuration.Definitions.EventNames;
-using ActivityNames = Etcd.Configuration.Definitions.ActivityNames;
+using EtcdEventNames = Itn.Etcd.Configuration.Definitions.EventNames;
+using ActivityNames = Itn.Etcd.Configuration.Definitions.ActivityNames;
 
-namespace Etcd.Configuration
+namespace Itn.Etcd.Configuration
 {
     internal class EtcdConfigurationProvider : ConfigurationProvider
     {

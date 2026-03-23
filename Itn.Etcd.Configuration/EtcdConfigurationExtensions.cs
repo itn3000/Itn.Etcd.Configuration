@@ -1,5 +1,5 @@
-﻿using Etcd.Configuration;
-using Grpc.Net.Client;
+﻿using Grpc.Net.Client;
+using Itn.Etcd.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Net.Security;

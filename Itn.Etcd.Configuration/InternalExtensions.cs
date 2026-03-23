@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
-namespace Etcd.Configuration
+namespace Itn.Etcd.Configuration
 {
     internal static class InternalExtensions
     {

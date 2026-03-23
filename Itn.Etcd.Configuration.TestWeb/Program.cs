@@ -10,7 +10,7 @@ builder.Services.AddOpenTelemetry()
     .UseOtlpExporter()
     .WithTracing(tracer =>
     {
-        tracer.AddSource(Etcd.Configuration.Definitions.ProviderDiagnosticName);
+        tracer.AddSource(Itn.Etcd.Configuration.Definitions.ProviderDiagnosticName);
     })
     ;
 var app = builder.Build();

@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Etcd.Configuration.AspireAppHost\Etcd.Configuration.AspireAppHost.csproj" />
+    <ProjectReference Include="..\Itn.Etcd.Configuration.AspireAppHost\Etcd.Configuration.AspireAppHost.csproj" />
   </ItemGroup>
 
   <ItemGroup>
