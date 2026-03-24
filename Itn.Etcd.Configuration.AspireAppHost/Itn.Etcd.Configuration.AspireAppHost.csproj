@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Itn.Etcd.Configuration.TestWeb\Etcd.Configuration.TestWeb.csproj" />
+    <ProjectReference Include="..\Itn.Etcd.Configuration.TestWeb\Itn.Etcd.Configuration.TestWeb.csproj" />
   </ItemGroup>
 
 </Project>

@@ -14,6 +14,8 @@ namespace Itn.Etcd.Configuration
     public record class ClientAlreadyUpdateEventArgs(string ActivityId);
     public record class UpdateByAnotherEventArgs(string ActivityId);
     public record class CancelEventArgs(string ActivityId);
+    public record class ConnectionRenewArgs();
+    public record class LoadDoneArgs(string RootKey);
     public static class Definitions
     {
         public const string ProviderDiagnosticName = $"Etcd.Configuration.{nameof(EtcdConfigurationProvider)}";

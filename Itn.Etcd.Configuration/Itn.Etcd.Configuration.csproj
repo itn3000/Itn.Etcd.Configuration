@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Itn.Etcd.Configuration</RootNamespace>
+    <VersionPrefix>0.1.0</VersionPrefix>
   </PropertyGroup>
 
   <ItemGroup>

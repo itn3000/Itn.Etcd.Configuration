@@ -147,6 +147,10 @@ namespace Itn.Etcd.Configuration
                         Data = newdic;
                         lastLoad = DateTimeOffset.Now;
                         OnReload();
+                        if(diagnosticSource.IsEnabled(ActivityNames.Load))
+                        {
+                            diagnosticSource.Write(ActivityNames.Load, new LoadDoneArgs(rootKey));
+                        }
                         break;
                     }
                     catch (Exception e)
@@ -167,9 +171,9 @@ namespace Itn.Etcd.Configuration
                 }
                 catch (OperationCanceledException)
                 {
-                    if (act != null)
+                    if (diagnosticSource.IsEnabled(EtcdEventNames.Cancel))
                     {
-                        act.AddEvent(new ActivityEvent("Canceled"));
+                        diagnosticSource.Write(EtcdEventNames.Cancel, new CancelEventArgs(act?.Id ?? ""));
                     }
                     break;
                 }
@@ -208,6 +212,10 @@ namespace Itn.Etcd.Configuration
                     Data = newdic;
                     lastLoad = DateTimeOffset.Now;
                     OnReload();
+                    if (diagnosticSource.IsEnabled(ActivityNames.Load))
+                    {
+                        diagnosticSource.Write(ActivityNames.Load, new LoadDoneArgs(rootKey));
+                    }
                 }
                 catch (Exception e)
                 {
@@ -217,8 +225,7 @@ namespace Itn.Etcd.Configuration
                     }
                     if (act != null)
                     {
-                        act.AddException(e, [new("name", EtcdEventNames.LoadError)]);
-                        act.SetStatus(ActivityStatusCode.Error);
+                        act.SetStatus(ActivityStatusCode.Error, EtcdEventNames.LoadError);
                     }
                 }
                 finally
@@ -270,6 +277,10 @@ namespace Itn.Etcd.Configuration
                     etcdClient = etcdClientFactory.CreateClient();
                     oldClient?.Dispose();
                     _watchId = null;
+                    if (diagnosticSource.IsEnabled(ActivityNames.RenewClient))
+                    {
+                        diagnosticSource.Write(ActivityNames.RenewClient, new ConnectionRenewArgs());
+                    }
                 }
                 catch (Exception e)
                 {
@@ -279,7 +290,7 @@ namespace Itn.Etcd.Configuration
                     }
                     if (act != null)
                     {
-                        act.SetStatus(ActivityStatusCode.Error);
+                        act.SetStatus(ActivityStatusCode.Error, EtcdEventNames.RenewClientError);
                     }
                 }
             }
@@ -360,7 +371,7 @@ namespace Itn.Etcd.Configuration
                         }
                         if (act != null)
                         {
-                            act.SetStatus(ActivityStatusCode.Error);
+                            act.SetStatus(ActivityStatusCode.Error, EtcdEventNames.WatchError);
                         }
                         try
                         {
@@ -371,9 +382,9 @@ namespace Itn.Etcd.Configuration
                     }
                     catch (OperationCanceledException)
                     {
-                        if (act != null)
+                        if (diagnosticSource.IsEnabled(EtcdEventNames.Cancel))
                         {
-                            act.AddEvent(new ActivityEvent(EtcdEventNames.OperationCancel));
+                            diagnosticSource.Write(EtcdEventNames.Cancel, new CancelEventArgs(act?.Id ?? ""));
                         }
                     }
                     catch (Exception e)
@@ -384,7 +395,7 @@ namespace Itn.Etcd.Configuration
                         }
                         if (act != null)
                         {
-                            act.SetStatus(ActivityStatusCode.Error);
+                            act.SetStatus(ActivityStatusCode.Error, EtcdEventNames.WatchError);
                         }
                         try
                         {

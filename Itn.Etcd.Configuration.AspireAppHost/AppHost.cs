@@ -2,7 +2,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 var etcd = builder.AddEtcd("etcdtest")
     ;
-builder.AddProject<Projects.Etcd_Configuration_TestWeb>("etcd-configuration-testweb")
+builder.AddProject<Projects.Itn_Etcd_Configuration_TestWeb>("etcd-configuration-testweb")
     .WithReference(etcd)
     .WaitFor(etcd);
 
