@@ -6,12 +6,21 @@
     <Nullable>enable</Nullable>
     <RootNamespace>Itn.Etcd.Configuration</RootNamespace>
     <VersionPrefix>0.1.0</VersionPrefix>
+    <Authors>Itn3000</Authors>
+    <Owners>Itn3000</Owners>
+    <Description>Configuration provider using Etcd</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Copyright>(C) 2026 Itn</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="dotnet-etcd" Version="8.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.3" />
     <PackageReference Include="R3" Version="1.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" PackagePath="/" Pack="true"/>
   </ItemGroup>
 
 </Project>

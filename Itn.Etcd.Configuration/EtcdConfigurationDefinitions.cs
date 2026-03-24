@@ -18,7 +18,7 @@ namespace Itn.Etcd.Configuration
     public record class LoadDoneArgs(string RootKey);
     public static class Definitions
     {
-        public const string ProviderDiagnosticName = $"Etcd.Configuration.{nameof(EtcdConfigurationProvider)}";
+        public const string ProviderDiagnosticName = $"Itn.Etcd.Configuration.{nameof(EtcdConfigurationProvider)}";
         public static class EventNames
         {
             public const string LoadError = nameof(LoadError);

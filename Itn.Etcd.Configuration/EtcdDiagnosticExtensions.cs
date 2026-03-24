@@ -5,8 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using Itn.Etcd.Configuration;
 
-namespace Itn.Etcd.Configuration
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class EtcdDiagnosticExtensions
     {
