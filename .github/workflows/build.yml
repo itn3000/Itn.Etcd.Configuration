@@ -4,10 +4,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: setup dotnet
+      - name: setup dotnet 10.0
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version:
-            - "10.0"
+          dotnet-version: "10.0.x"
+      - name: setup dotnet 8.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
       - name: do test
         run: dotnet test Itn.Etcd.Configuration.AspireTest/Itn.Etcd.Configuration.AspireTest.csproj -c Release
+      - name: pack
+        run: dotnet pack -c Release Itn.Etcd.Configuration/Itn.Etcd.Configuration.csproj
+      - name: collect artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: nuget-package
+          path: artifacts/package/release/*.nupkg
