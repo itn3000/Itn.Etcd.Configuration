@@ -12,6 +12,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Copyright>(C) 2026 Itn</Copyright>
+    <PackageProjectUrl>https://github.com/itn3000/Etcd.Configuration</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

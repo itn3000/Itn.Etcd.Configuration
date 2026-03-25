@@ -13,9 +13,7 @@ jobs:
         with:
           dotnet-version: "8.0.x"
       - name: do test
-        run: dotnet test Itn.Etcd.Configuration.AspireTest/Itn.Etcd.Configuration.AspireTest.csproj -c Release
-      - name: pack
-        run: dotnet pack -c Release Itn.Etcd.Configuration/Itn.Etcd.Configuration.csproj
+        run: dotnet run build.cs -- --target Default --configuration Release
       - name: collect artifact
         uses: actions/upload-artifact@v6
         with:

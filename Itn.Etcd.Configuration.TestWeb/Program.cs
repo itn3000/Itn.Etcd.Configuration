@@ -8,7 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("etcdtest");
 ArgumentNullException.ThrowIfNullOrEmpty(connectionString);
 var intervalSec = builder.Configuration.GetValue<int?>("Etcd:CheckStatusIntervalSec");
-builder.Configuration.AddEtcd(urls: connectionString, checkStatusIntervalSec: intervalSec.GetValueOrDefault(5));
+var keySeparator = builder.Configuration.GetSection("Etcd").GetValue<string>("KeySeparator");
+if(string.IsNullOrEmpty(keySeparator))
+{
+    keySeparator = ":";
+}
+builder.Configuration.AddEtcd(urls: connectionString, checkStatusIntervalSec: intervalSec.GetValueOrDefault(5), keySeparator: keySeparator[0]);
 //builder.Services.AddSingleton<EtcdConfigrationDiagnosticListener>();
 builder.Services.AddOpenTelemetry()
     .UseOtlpExporter()

@@ -58,8 +58,8 @@ namespace Microsoft.Extensions.DependencyInjection
             string activityId);
         [LoggerMessage(EventId = 6, EventName = "RenewClient", Level = LogLevel.Information, Message = "client renew done")]
         static private partial void Log_RenewClient(ILogger logger, Exception? exception);
-        [LoggerMessage(EventId = 7, EventName = "LoadDone", Level = LogLevel.Information, Message = "key load done({RootKey})")]
-        static private partial void Log_LoadDone(ILogger logger, Exception? exception, string rootKey);
+        [LoggerMessage(EventId = 7, EventName = "LoadDone", Level = LogLevel.Information, Message = "key load done({RootKey}, {KeySeparator}, {KeyCount})")]
+        static private partial void Log_LoadDone(ILogger logger, Exception? exception, string rootKey, char keySeparator, int keyCount);
         public void OnCompleted()
         {
         }
@@ -109,7 +109,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     }
                 case (LoadDoneArgs args):
                     {
-                        Log_LoadDone(logger, null, args.RootKey);
+                        Log_LoadDone(logger, null, args.RootKey, args.KeySeparator, args.KeyCount);
                         break;
                     }
                 default:

@@ -12,6 +12,7 @@ using Microsoft.Extensions.Primitives;
 using EtcdEventNames = Itn.Etcd.Configuration.Definitions.EventNames;
 using ActivityNames = Itn.Etcd.Configuration.Definitions.ActivityNames;
 using System.Globalization;
+using Google.Protobuf;
 
 namespace Itn.Etcd.Configuration
 {
@@ -33,8 +34,10 @@ namespace Itn.Etcd.Configuration
         TimeSpan checkStatusInterval;
         TimeSpan loadThrottle;
         static long ChangeTokenKeySeed = 0;
-        public EtcdConfigurationProvider(string key, EtcdClientFactory clientFactory, TimeSpan checkStatusInterval, TimeSpan loadThrottle)
+        char keySeparator;
+        public EtcdConfigurationProvider(string key, EtcdClientFactory clientFactory, TimeSpan checkStatusInterval, TimeSpan loadThrottle, char separator)
         {
+            keySeparator = separator;
             this.checkStatusInterval = checkStatusInterval;
             this.loadThrottle = loadThrottle;
             rootKey = key;
@@ -109,6 +112,20 @@ namespace Itn.Etcd.Configuration
                 }
             }
         }
+        string GetKey(string rootKey, ByteString key)
+        {
+            var sp = key.ToStringUtf8().AsSpan(rootKey.Length).TrimStart(keySeparator);
+            if (keySeparator != ':')
+            {
+                Span<char> cp = stackalloc char[sp.Length];
+                sp.Replace(cp, keySeparator, ':');
+                return new string(cp);
+            }
+            else
+            {
+                return new string(sp);
+            }
+        }
         async ValueTask LoadAsync(CancellationToken ct)
         {
             using var act = activitySource.StartActivity(ActivityNames.LoadAsync);
@@ -138,10 +155,10 @@ namespace Itn.Etcd.Configuration
                         var newdic = new Dictionary<string, string?>();
                         foreach (var kv in res.Kvs)
                         {
-                            var key = kv.Key.ToStringUtf8().Substring(rootKey.Length);
+                            var key = GetKey(rootKey, kv.Key);
                             if (!string.IsNullOrEmpty(key))
                             {
-                                newdic[kv.Key.ToStringUtf8().Substring(rootKey.Length)] = kv.Value?.ToStringUtf8();
+                                newdic[key] = kv.Value?.ToStringUtf8();
                             }
                         }
                         Data = newdic;
@@ -149,7 +166,7 @@ namespace Itn.Etcd.Configuration
                         OnReload();
                         if(diagnosticSource.IsEnabled(ActivityNames.Load))
                         {
-                            diagnosticSource.Write(ActivityNames.Load, new LoadDoneArgs(rootKey));
+                            diagnosticSource.Write(ActivityNames.Load, new LoadDoneArgs(rootKey, keySeparator, newdic.Count));
                         }
                         break;
                     }
@@ -207,14 +224,15 @@ namespace Itn.Etcd.Configuration
                     var newdic = new Dictionary<string, string?>();
                     foreach (var kv in res.Kvs)
                     {
-                        newdic[kv.Key.ToStringUtf8().Substring(rootKey.Length)] = kv.Value?.ToStringUtf8();
+                        var key = GetKey(rootKey, kv.Key);
+                        newdic[key] = kv.Value?.ToStringUtf8();
                     }
                     Data = newdic;
                     lastLoad = DateTimeOffset.Now;
                     OnReload();
                     if (diagnosticSource.IsEnabled(ActivityNames.Load))
                     {
-                        diagnosticSource.Write(ActivityNames.Load, new LoadDoneArgs(rootKey));
+                        diagnosticSource.Write(ActivityNames.Load, new LoadDoneArgs(rootKey, keySeparator, newdic.Count));
                     }
                 }
                 catch (Exception e)

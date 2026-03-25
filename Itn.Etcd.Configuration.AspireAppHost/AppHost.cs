@@ -2,8 +2,10 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 var etcd = builder.AddEtcd("etcdtest")
     ;
+var keySeparator = builder.AddParameter("key-separator", ":");
 builder.AddProject<Projects.Itn_Etcd_Configuration_TestWeb>("etcd-configuration-testweb")
     .WithReference(etcd)
+    .WithEnvironment("Etcd__KeySeparator", keySeparator)
     .WaitFor(etcd);
 
 builder.Build().Run();
