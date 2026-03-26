@@ -16,7 +16,8 @@ namespace Etcd.Configuration.AspireTest
             Environment.SetEnvironmentVariable("http_proxy", "");
             Environment.SetEnvironmentVariable("https_proxy", "");
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
-            var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Itn_Etcd_Configuration_AspireAppHost>(cts.Token);
+            using var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Itn_Etcd_Configuration_AspireAppHost>(cts.Token);
+            appHost.Configuration.GetSection("Parameters:key-separator").Value = ":";
             appHost.Services.AddLogging(logging =>
             {
                 logging.SetMinimumLevel(LogLevel.Debug);

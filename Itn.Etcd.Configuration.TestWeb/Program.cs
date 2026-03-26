@@ -13,7 +13,7 @@ if(string.IsNullOrEmpty(keySeparator))
 {
     keySeparator = ":";
 }
-builder.Configuration.AddEtcd(urls: connectionString, checkStatusIntervalSec: intervalSec.GetValueOrDefault(5), keySeparator: keySeparator[0]);
+builder.Configuration.AddEtcd(urls: connectionString, loadThrottleSec: 0, checkStatusIntervalSec: intervalSec.GetValueOrDefault(5), keySeparator: keySeparator[0]);
 //builder.Services.AddSingleton<EtcdConfigrationDiagnosticListener>();
 builder.Services.AddOpenTelemetry()
     .UseOtlpExporter()
