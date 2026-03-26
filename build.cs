@@ -10,7 +10,7 @@ Task("Test")
     .Does(() =>
     {
         var project = Directory("Itn.Etcd.Configuration.AspireTest").Path.CombineWithFilePath("Itn.Etcd.Configuration.AspireTest.csproj");
-        var buildlogdir = Directory("artifacts").Path.Combine("buildlog");
+        var buildlogdir = Directory("artifacts").Path.Combine("buildlog").Combine(configuration);
         var buildlog = buildlogdir.CombineWithFilePath("test.binlog");
         DotNetTest(project.FullPath, new DotNetTestSettings()
         {

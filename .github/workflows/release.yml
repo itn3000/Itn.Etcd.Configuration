@@ -1,4 +1,7 @@
-on: push
+on:
+  release:
+    types:
+      - published
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,7 +16,7 @@ jobs:
         with:
           dotnet-version: "8.0.x"
       - name: do test
-        run: dotnet run build.cs -- --target Default --configuration Release
+        run: dotnet run build.cs -- --target Pack --configuration Release
       - name: collect artifact
         uses: actions/upload-artifact@v6
         with:
@@ -24,3 +27,9 @@ jobs:
         with:
           name: binlog
           path: artifacts/buildlog/*.binlog
+      - name: upload package to nuget
+        run: "dotnet nuget push -k \"${{secrets.NUGET_API_KEY}}\" ./artifacts/package/release/Itn.Etcd.Configuration.*.nupkg -s https://api.nuget.org/v3/index.json"
+      - name: upload package to release
+        run: "gh release upload --clobber  ${{github.event.release.tag_name}} ./artifacts/package/release/Itn.Etcd.Configuration.*.nupkg"
+        env:
+          GH_TOKEN: ${{github.token}}
