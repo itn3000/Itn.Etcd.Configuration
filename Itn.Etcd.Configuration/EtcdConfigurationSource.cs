@@ -9,7 +9,9 @@ namespace Itn.Etcd.Configuration
     {
         public IConfigurationProvider Build(IConfigurationBuilder builder)
         {
-            return new EtcdConfigurationProvider(options.RootKey, etcdClientFactory, TimeSpan.FromSeconds(options.CheckStatusIntervalSec), TimeSpan.FromSeconds(options.LoadThrottleSec), options.KeySeparator);
+            return new EtcdConfigurationProvider(options.RootKey, etcdClientFactory, 
+                options.CheckStatusInterval ?? TimeSpan.FromSeconds(Definitions.DefaultCheckStatusIntervalSec), 
+                options.LoadThrottle ?? TimeSpan.FromSeconds(Definitions.DefaultLoadThrottleSec), options.KeySeparator);
         }
     }
 }

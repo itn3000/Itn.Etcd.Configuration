@@ -17,8 +17,8 @@ namespace Itn.Etcd.Configuration
     /// <param name="KeySeparator">etcd key separator for configuration section</param>
     /// <param name="ConfigureChannelOptions">configurator grpc channel options</param>
     /// <param name="ConfigureSslOptions">configurator tls connection options</param>
-    /// <param name="CheckStatusIntervalSec">etcd server connection check interval</param>
-    /// <param name="LoadThrottleSec">load throttling time</param>
+    /// <param name="CheckStatusInterval">etcd server connection check interval(default: 30sec)</param>
+    /// <param name="LoadThrottle">load throttling time(default: 1sec)</param>
     /// <remarks>detailed connection spec is under https://github.com/shubhamranjan/dotnet-etcd/blob/main/docs/client-initialization/index.md</remarks>
     public record class EtcdConfigurationOptions(string RootKey,
         string Urls = "http://localhost:2379",
@@ -28,8 +28,8 @@ namespace Itn.Etcd.Configuration
         char KeySeparator = ':',
         Action<GrpcChannelOptions>? ConfigureChannelOptions = null,
         Action<SslClientAuthenticationOptions>? ConfigureSslOptions = null,
-        int CheckStatusIntervalSec = 30,
-        int LoadThrottleSec = 1
+        TimeSpan? CheckStatusInterval = null,
+        TimeSpan? LoadThrottle = null
         )
     {
         public EtcdConfigurationOptions() : this("")

@@ -11,7 +11,7 @@ namespace Microsoft.Extensions.Configuration
     public static class EtcdConfigurationExtensions
     {
         /// <summary>
-        /// add etcd configuration provider
+        /// add etcd configuration provider <seealso cref="EtcdConfigurationOptions"/>
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="rootKey">etcd search key prefix</param>
@@ -22,8 +22,8 @@ namespace Microsoft.Extensions.Configuration
         /// <param name="keySeparator">key separator, replace to ':' when loading</param>
         /// <param name="configureChannelOptions">grpc channel options</param>
         /// <param name="configureSslOptions">tls settings, use if you want to skip cert validation</param>
-        /// <param name="checkStatusIntervalSec">connection check interval</param>
-        /// <param name="loadThrottleSec">loading throttling time</param>
+        /// <param name="checkStatusInterval">connection check interval</param>
+        /// <param name="loadThrottle">loading throttling time</param>
         /// <remarks>detailed connection spec is under https://github.com/shubhamranjan/dotnet-etcd/blob/main/docs/client-initialization/index.md</remarks>
         /// <returns></returns>
         public static IConfigurationBuilder AddEtcd(this IConfigurationBuilder builder,
@@ -35,13 +35,13 @@ namespace Microsoft.Extensions.Configuration
             char keySeparator = ':',
             Action<GrpcChannelOptions>? configureChannelOptions = null,
             Action<SslClientAuthenticationOptions>? configureSslOptions = null,
-            int checkStatusIntervalSec = 30,
-            int loadThrottleSec = 1
+            TimeSpan? checkStatusInterval = null,
+            TimeSpan? loadThrottle = null
             )
         {
             var options = new EtcdConfigurationOptions(rootKey, Urls: urls, User: user, Password: password,
                 ServerName: serverName, KeySeparator: keySeparator, ConfigureChannelOptions: configureChannelOptions, ConfigureSslOptions: configureSslOptions,
-                CheckStatusIntervalSec: checkStatusIntervalSec, LoadThrottleSec: loadThrottleSec);
+                CheckStatusInterval: checkStatusInterval, LoadThrottle: loadThrottle);
             return AddEtcd(builder, options);
         }
         /// <summary>
