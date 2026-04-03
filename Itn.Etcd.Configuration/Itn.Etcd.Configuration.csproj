@@ -22,6 +22,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" PackagePath="/" Pack="true"/>
+    <None Include="../LICENSE" PackagePath="/" Pack="true"/>
   </ItemGroup>
 
 </Project>
